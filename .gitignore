@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+dist/
+usb_kit/OTPNET/data/
+usb_kit/OTPNET/vendor/
+usb_kit/OTPNET/wheels/
+usb_kit/OTPNET/demo_run/
