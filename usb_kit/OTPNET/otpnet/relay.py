@@ -40,8 +40,10 @@ class Relay:
         else:
             k = {"node_id": node_id, "routing_key": onion.b64e(onion.generate_private()),
                  "ledger_secret": _secrets.token_hex(32)}
-            with open(keyfile, "w") as f:
-                json.dump(k, f, indent=2)
+        # remember the network so `otpnet wallet --relay ID` can find this relay's wallet
+        k["bootstrap"] = "%s:%d" % tuple(bootstrap)
+        with open(keyfile, "w") as f:
+            json.dump(k, f, indent=2)
         self.priv = onion.b64d(k["routing_key"])
         self.pub = onion.public_from_private(self.priv)
         self.ledger_secret = k["ledger_secret"]

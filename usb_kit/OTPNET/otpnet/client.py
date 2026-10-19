@@ -16,6 +16,7 @@ from . import PROTOCOL, onion, packet, wire
 from .otpcrypto import DEFAULT_MAC, MAC_ALGS
 from .pad import burn_segment, copy_pad, generate_pad, read_segment
 from .state import State
+from .wallet import Wallet
 
 CLIENT_TIMEOUT = 90.0
 
@@ -126,8 +127,8 @@ class Client:
         return resp
 
     def wallet(self):
-        return self._bootstrap({"type": "open_account", "account_id": self.drive.user_id,
-                                "secret": self.drive.identity["ledger_secret"]})["balance"]
+        """Open (if needed) this drive's wallet and return its balance."""
+        return Wallet.for_drive(self.drive).open()
 
     def relays(self):
         return self._bootstrap({"type": "list_relays"})["relays"]

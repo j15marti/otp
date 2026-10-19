@@ -174,6 +174,32 @@ class Ledger(TmpDir):
                                    payee="relay", amount=1000, hashlock="00")["ok"])
 
 
+    def test_wallet_transfer_and_history(self):
+        self.b = Bootstrap(self.path("n.db"), faucet=10, log=lambda *_: None)
+        self.addCleanup(self.b.db.close)
+        self.call(type="open_account", account_id="alice", secret="s")
+        self.call(type="open_account", account_id="bob", secret="t")
+        bad = [dict(to="bob", amount=11), dict(to="bob", amount=-1), dict(to="bob", amount=0),
+               dict(to="alice", amount=1), dict(to="nobody", amount=1)]
+        for b in bad:
+            self.assertFalse(self.call(type="transfer", account_id="alice", secret="s", **b)["ok"], b)
+        self.assertFalse(self.call(type="transfer", account_id="alice", secret="wrong", to="bob", amount=1)["ok"])
+        r = self.call(type="transfer", account_id="alice", secret="s", to="bob", amount=2.5, memo="lunch")
+        self.assertEqual(r["balance"], 7.5)
+        h = self.call(type="history", account_id="bob", secret="t")
+        self.assertEqual(h["balance"], 12.5)
+        self.assertEqual([(e["kind"], e["amount"], e["counterparty"], e["memo"]) for e in h["entries"]],
+                         [("transfer_in", 2.5, "alice", "lunch"), ("faucet", 10.0, "network", "welcome tokens")])
+        # relay fee: earned entry must not reveal the payer
+        pre = os.urandom(32)
+        e = self.call(type="escrow_create", account_id="alice", secret="s", payee="bob", amount=1,
+                      hashlock=hashlib.sha256(pre).hexdigest())["escrow_id"]
+        self.assertEqual(self.call(type="balance", account_id="alice", secret="s")["locked"], 1.0)
+        self.call(type="escrow_claim", escrow_id=e, preimage=pre.hex())
+        top = self.call(type="history", account_id="bob", secret="t")["entries"][0]
+        self.assertEqual((top["kind"], top["counterparty"]), ("fee_earned", ""))
+
+
 class Pairing(TmpDir):
     def test_pair_and_receive_without_network(self):
         a = Drive.init(self.path("a"), "alice", "127.0.0.1:5001")

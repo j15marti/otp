@@ -7,6 +7,7 @@ import os
 import sys
 
 from . import KIT_ROOT, PROTOCOL, __version__
+from .wire import parse_addr
 
 DEFAULT_HOME = os.environ.get("OTPNET_HOME") or os.path.join(KIT_ROOT, "data")
 
@@ -126,10 +127,46 @@ def cmd_read(args):
            m["otp_offset"], m["payload_length"], m["status"], m["body"]))
 
 
+def _wallet(args):
+    from .wallet import Wallet
+    if args.relay:
+        return Wallet.for_relay(args.home, args.relay, args.bootstrap)
+    w = Wallet.for_drive(_drive(args))
+    if args.bootstrap:
+        w.bootstrap = parse_addr(args.bootstrap)
+    return w
+
+
+def print_history(entries):
+    from .wallet import KIND_LABELS
+    if not entries:
+        log("  (no transactions yet)")
+    for e in entries:
+        ts = datetime.datetime.fromtimestamp(e["ts"]).strftime("%Y-%m-%d %H:%M")
+        who = (" " + ("to " if e["amount"] < 0 else "from ") + e["counterparty"]) if e["counterparty"] else ""
+        memo = ("  \"%s\"" % e["memo"]) if e["memo"] and e["kind"].startswith("transfer") else ""
+        log("  %s  %+10.2f  %s%s%s" % (ts, e["amount"], KIND_LABELS.get(e["kind"], e["kind"]), who, memo))
+
+
 def cmd_wallet(args):
-    from .client import Client
-    d = _drive(args)
-    log("%s: %.6f tokens" % (d.user_id, Client(d).wallet()))
+    w = _wallet(args)
+    action = args.action or "show"
+    if action == "show":
+        h = w.history(10)
+        log("Wallet %r: %.2f tokens%s" % (w.account_id, h["balance"],
+            ("  (%.2f held for messages in flight)" % h["locked"]) if h["locked"] else ""))
+        log("Recent activity:")
+        print_history(h["entries"])
+    elif action == "history":
+        print_history(w.history(args.limit)["entries"])
+    elif action == "send":
+        bal = w.send(args.to, args.amount, args.memo or "")
+        log("Sent %.2f tokens to %s. New balance: %.2f" % (args.amount, args.to, bal))
+    elif action == "address":
+        log("Your wallet name is: %s   (others send you tokens with: otpnet wallet send --to %s --amount N)"
+            % (w.account_id, w.account_id))
+    elif action == "backup":
+        log("Wallet key copied to %s. Keep it somewhere safe and private." % w.backup(args.dest))
 
 
 def cmd_relays(args):
@@ -180,7 +217,8 @@ def cmd_doctor(args):
 def build_parser():
     p = argparse.ArgumentParser(prog="otpnet", description="TRNG one-time-pad messaging over a token-incentivized onion relay network.")
     p.add_argument("--home", default=DEFAULT_HOME, help="drive data directory (default: %(default)s)")
-    sub = p.add_subparsers(dest="cmd", required=True)
+    sub = p.add_subparsers(dest="cmd", metavar="command",
+                         help="run with no command for the friendly menu")
 
     s = sub.add_parser("init", help="set up this drive's identity")
     s.add_argument("--name", required=True, help="your user id on the network")
@@ -222,7 +260,21 @@ def build_parser():
     s.add_argument("id", type=int)
     s.set_defaults(fn=cmd_read)
 
-    sub.add_parser("wallet", help="show token balance").set_defaults(fn=cmd_wallet)
+    s = sub.add_parser("wallet", help="tokens: balance, history, send, backup")
+    s.add_argument("--relay", metavar="ID", help="use the wallet of a relay you run from this drive")
+    s.add_argument("--bootstrap", help="network address (default: from config)")
+    ws = s.add_subparsers(dest="action")
+    ws.add_parser("show", help="balance and recent activity (default)")
+    w = ws.add_parser("history", help="full transaction history")
+    w.add_argument("--limit", type=int, default=50)
+    w = ws.add_parser("send", help="send tokens to another user or relay")
+    w.add_argument("--to", required=True)
+    w.add_argument("--amount", type=float, required=True)
+    w.add_argument("--memo")
+    ws.add_parser("address", help="show the name others use to pay you")
+    w = ws.add_parser("backup", help="copy your wallet key to a safe place")
+    w.add_argument("dest", help="file or folder to copy to")
+    s.set_defaults(fn=cmd_wallet)
     sub.add_parser("relays", help="list relays in the directory").set_defaults(fn=cmd_relays)
 
     s = sub.add_parser("relay", help="run a relay node and earn tokens")
@@ -255,6 +307,9 @@ def main(argv=None):
     from .state import UnknownContact
     args = build_parser().parse_args(argv)
     try:
+        if args.cmd is None:
+            from .menu import run
+            return run(args.home)
         return args.fn(args) or 0
     except KeyboardInterrupt:
         return 130

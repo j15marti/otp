@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS accounts (
 CREATE TABLE IF NOT EXISTS escrows (
     escrow_id TEXT PRIMARY KEY, payer TEXT, payee TEXT, amount INTEGER, hashlock TEXT,
     expires REAL, status TEXT, created REAL);
+CREATE TABLE IF NOT EXISTS ledger_log (
+    id INTEGER PRIMARY KEY, ts REAL, account_id TEXT, delta INTEGER, kind TEXT,
+    counterparty TEXT, memo TEXT);
 """
 
 
@@ -85,11 +88,20 @@ class Bootstrap:
             raise LedgerError("bad account secret")
         return row
 
+    def _log(self, account_id, delta, kind, counterparty="", memo=""):
+        self.db.execute("INSERT INTO ledger_log (ts, account_id, delta, kind, counterparty, memo)"
+                        " VALUES (?,?,?,?,?,?)", (time.time(), account_id, delta, kind, counterparty, memo))
+
+    def _locked(self, account_id):
+        return self.db.execute("SELECT COALESCE(SUM(amount), 0) FROM escrows WHERE payer=? AND status='locked'",
+                               (account_id,)).fetchone()[0]
+
     def _open(self, account_id, secret):
         h = hashlib.sha256(secret.encode()).hexdigest()
         row = self.db.execute("SELECT * FROM accounts WHERE account_id=?", (account_id,)).fetchone()
         if row is None:
             self.db.execute("INSERT INTO accounts VALUES (?,?,?)", (account_id, h, self.faucet))
+            self._log(account_id, self.faucet, "faucet", "network", "welcome tokens")
             self.log("[bootstrap] opened account %s with %.2f faucet tokens"
                      % (account_id, tokens(self.faucet)))
             return self.faucet
@@ -104,6 +116,7 @@ class Bootstrap:
             self.db.execute("UPDATE escrows SET status='refunded' WHERE escrow_id=?", (e["escrow_id"],))
             self.db.execute("UPDATE accounts SET balance=balance+? WHERE account_id=?",
                             (e["amount"], e["payer"]))
+            self._log(e["payer"], e["amount"], "fee_refund", e["payee"], "relay did not deliver in time")
 
     # -- directory ----------------------------------------------------------
 
@@ -132,7 +145,36 @@ class Bootstrap:
         return {"balance": tokens(self._open(req["account_id"], req["secret"]))}
 
     def op_balance(self, req):
-        return {"balance": tokens(self._auth(req["account_id"], req["secret"])["balance"])}
+        acct = self._auth(req["account_id"], req["secret"])
+        return {"balance": tokens(acct["balance"]), "locked": tokens(self._locked(acct["account_id"]))}
+
+    def op_transfer(self, req):
+        acct = self._auth(req["account_id"], req["secret"])
+        to, amount = req["to"], to_units(req["amount"])
+        memo = str(req.get("memo", ""))[:200]
+        if amount <= 0:
+            raise LedgerError("amount must be positive")
+        if to == acct["account_id"]:
+            raise LedgerError("can't send tokens to yourself")
+        if self.db.execute("SELECT 1 FROM accounts WHERE account_id=?", (to,)).fetchone() is None:
+            raise LedgerError("no wallet called %r on this network" % to)
+        if acct["balance"] < amount:
+            raise LedgerError("not enough tokens: you have %.6g, tried to send %.6g"
+                              % (tokens(acct["balance"]), tokens(amount)))
+        self.db.execute("UPDATE accounts SET balance=balance-? WHERE account_id=?", (amount, acct["account_id"]))
+        self.db.execute("UPDATE accounts SET balance=balance+? WHERE account_id=?", (amount, to))
+        self._log(acct["account_id"], -amount, "transfer_out", to, memo)
+        self._log(to, amount, "transfer_in", acct["account_id"], memo)
+        return {"balance": tokens(acct["balance"] - amount)}
+
+    def op_history(self, req):
+        acct = self._auth(req["account_id"], req["secret"])
+        limit = max(1, min(int(req.get("limit", 20)), 500))
+        rows = self.db.execute("SELECT * FROM ledger_log WHERE account_id=? ORDER BY id DESC LIMIT ?",
+                               (acct["account_id"], limit)).fetchall()
+        return {"balance": tokens(acct["balance"]), "locked": tokens(self._locked(acct["account_id"])),
+                "entries": [{"ts": r["ts"], "amount": tokens(r["delta"]), "kind": r["kind"],
+                             "counterparty": r["counterparty"], "memo": r["memo"]} for r in rows]}
 
     def op_escrow_create(self, req):
         acct = self._auth(req["account_id"], req["secret"])
@@ -148,6 +190,7 @@ class Bootstrap:
         self.db.execute("INSERT INTO escrows VALUES (?,?,?,?,?,?,?,?)",
                         (escrow_id, acct["account_id"], req["payee"], amount, req["hashlock"],
                          time.time() + float(req.get("ttl", 300)), "locked", time.time()))
+        self._log(acct["account_id"], -amount, "fee_paid", req["payee"], "relay fee (held until delivery)")
         return {"escrow_id": escrow_id}
 
     def op_escrow_info(self, req):
@@ -169,4 +212,6 @@ class Bootstrap:
         self.db.execute("UPDATE escrows SET status='claimed' WHERE escrow_id=?", (e["escrow_id"],))
         self.db.execute("UPDATE accounts SET balance=balance+? WHERE account_id=?",
                         (e["amount"], e["payee"]))
+        # deliberately no counterparty: a relay must not learn who funded the packet
+        self._log(e["payee"], e["amount"], "fee_earned", "", "forwarded a packet")
         return {"amount": tokens(e["amount"])}

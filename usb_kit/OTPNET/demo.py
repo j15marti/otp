@@ -185,6 +185,17 @@ def main():
         say("  alice balance %.2f, bob balance %.2f" % (a_bal, b_bal))
         check("Alice paid 3 msgs x 3 hops x 0.5", abs(a_bal - 95.5) < 1e-6, "%.2f" % a_bal)
         check("relays earned exactly what senders paid", abs(earned - 6.0) < 1e-6, "%.2f" % earned)
+
+        step("Wallet: Bob sends Alice 2 tokens; relay1 checks its earnings")
+        say(cli(bob_home, "wallet", "send", "--to", "alice", "--amount", "2", "--memo", "thanks").rstrip())
+        say(cli(alice_home, "wallet").rstrip())
+        relay_wallet = cli(net_home, "wallet", "--relay", "relay1")
+        say(relay_wallet.rstrip())
+        check("transfer moved tokens", abs(Client(alice).wallet() - 97.5) < 1e-6
+              and abs(Client(bob).wallet() - 96.5) < 1e-6)
+        check("relay wallet shows its earnings, but not who paid",
+              "102.00 tokens" in relay_wallet and "Earned forwarding" in relay_wallet
+              and "alice" not in relay_wallet and "bob" not in relay_wallet)
     finally:
         for p in procs:
             p.stop()

@@ -6,9 +6,16 @@ XOR-encrypted and authenticated with a one-time MAC, then carried by a
 token-incentivized, 3-hop onion-routing relay network.
 
 **The downloadable folder is [`usb_kit/OTPNET/`](usb_kit/OTPNET/).** Copy it to
-the root of a USB drive and it has everything needed to join a network. Its
-[README](usb_kit/OTPNET/README.md) is the user guide. To build the zip, with
-offline dependency wheels for Linux, macOS and Windows:
+the root of a USB drive and it has everything needed to join a network:
+double-click launchers for a step-by-step menu, the command-line client, a
+relay, the bootstrap service, a token wallet, and offline dependencies.
+
+* [usb_kit/OTPNET/README.md](usb_kit/OTPNET/README.md): plain-language guide
+  for non-technical users.
+* [usb_kit/OTPNET/TECHNICAL.md](usb_kit/OTPNET/TECHNICAL.md): command
+  reference, wallet, running a network, security notes and limitations.
+
+To build the zip, with offline dependency wheels for Linux, macOS and Windows:
 
 ```sh
 python build_kit.py        # -> dist/OTPNET-usb-kit.zip
@@ -31,6 +38,7 @@ python build_kit.py        # -> dist/OTPNET-usb-kit.zip
  │ onion.py    X25519 ECDH + HKDF-SHA256 + AES-256-GCM layers                │
  │ relay.py    peel one layer, check escrowed fee, forward, claim fee        │
  │ bootstrap   relay directory + hash-locked escrow token ledger             │
+ │ wallet.py   balances, history, transfers, key backup                      │
  │ wire.py     length-prefixed JSON over TCP                                 │
  └──────────────────────────────────────────────────────────────────────────┘
 
@@ -84,12 +92,12 @@ actually got the packet. Unclaimed escrows are refunded after their TTL.
 
 Known V1 limitations (central bootstrap, linkable ledger, no size padding,
 synchronous circuits) are listed in the
-[kit README](usb_kit/OTPNET/README.md#limitations-of-this-v1).
+[technical guide](usb_kit/OTPNET/TECHNICAL.md#limitations-of-this-v1).
 
 ## Running the tests
 
 ```sh
 cd usb_kit/OTPNET
 python -m unittest discover -s tests -v    # primitives, tamper/replay/forgery, onion, ledger, pairing
-python demo.py                             # Phase 4 integration over real local ports
+python demo.py                             # Phase 4 integration over real local ports, plus wallet
 ```
