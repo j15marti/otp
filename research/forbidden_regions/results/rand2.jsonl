@@ -1,0 +1,30 @@
+{"family": "rand2", "n": 10, "clauses": 15, "trial": 0, "pc_degree": 2, "dims": {"2": 6}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 10, "clauses": 15, "trial": 1, "pc_degree": 2, "dims": {"2": 32}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 10, "clauses": 15, "trial": 2, "pc_degree": 2, "dims": {"2": 21}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 10, "clauses": 15, "trial": 3, "pc_degree": 2, "dims": {"2": 13}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 10, "clauses": 15, "trial": 4, "pc_degree": 2, "dims": {"2": 31}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 20, "clauses": 30, "trial": 0, "pc_degree": 2, "dims": {"2": 96}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 20, "clauses": 30, "trial": 1, "pc_degree": 2, "dims": {"2": 34}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 20, "clauses": 30, "trial": 2, "pc_degree": 2, "dims": {"2": 127}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 20, "clauses": 30, "trial": 3, "pc_degree": 2, "dims": {"2": 146}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 20, "clauses": 30, "trial": 4, "pc_degree": 2, "dims": {"2": 111}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 30, "clauses": 45, "trial": 0, "pc_degree": 2, "dims": {"2": 223}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 30, "clauses": 45, "trial": 1, "pc_degree": 2, "dims": {"2": 248}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 30, "clauses": 45, "trial": 2, "pc_degree": 2, "dims": {"2": 189}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 30, "clauses": 45, "trial": 3, "pc_degree": 2, "dims": {"2": 176}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 30, "clauses": 45, "trial": 4, "pc_degree": 2, "dims": {"2": 385}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 40, "clauses": 60, "trial": 0, "pc_degree": 2, "dims": {"2": 218}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 40, "clauses": 60, "trial": 1, "pc_degree": 2, "dims": {"2": 152}, "note": "", "seconds": 0.0}
+{"family": "rand2", "n": 40, "clauses": 60, "trial": 2, "pc_degree": 3, "dims": {"2": 59, "3": 7494}, "note": "", "seconds": 0.07}
+{"family": "rand2", "n": 40, "clauses": 60, "trial": 3, "pc_degree": 2, "dims": {"2": 126}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 40, "clauses": 60, "trial": 4, "pc_degree": 2, "dims": {"2": 135}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 50, "clauses": 75, "trial": 0, "pc_degree": 2, "dims": {"2": 567}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 50, "clauses": 75, "trial": 1, "pc_degree": 3, "dims": {"2": 75, "3": 3160}, "note": "", "seconds": 0.12}
+{"family": "rand2", "n": 50, "clauses": 75, "trial": 2, "pc_degree": 2, "dims": {"2": 890}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 50, "clauses": 75, "trial": 3, "pc_degree": 2, "dims": {"2": 484}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 50, "clauses": 75, "trial": 4, "pc_degree": 2, "dims": {"2": 660}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 60, "clauses": 90, "trial": 0, "pc_degree": 2, "dims": {"2": 318}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 60, "clauses": 90, "trial": 1, "pc_degree": 2, "dims": {"2": 798}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 60, "clauses": 90, "trial": 2, "pc_degree": 2, "dims": {"2": 1140}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 60, "clauses": 90, "trial": 3, "pc_degree": 2, "dims": {"2": 1288}, "note": "", "seconds": 0.01}
+{"family": "rand2", "n": 60, "clauses": 90, "trial": 4, "pc_degree": 2, "dims": {"2": 582}, "note": "", "seconds": 0.01}
