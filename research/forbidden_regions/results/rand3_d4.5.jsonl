@@ -50,3 +50,15 @@
 {"family": "rand3", "n": 34, "clauses": 153, "trial": 1, "pc_degree": 4, "dims": {"3": 215, "4": 52490}, "note": "", "seconds": 125.15}
 {"family": "rand3", "n": 34, "clauses": 153, "trial": 2, "pc_degree": 4, "dims": {"3": 215, "4": 52595}, "note": "", "seconds": 67.06}
 {"family": "rand3", "n": 34, "clauses": 153, "trial": 3, "pc_degree": 4, "dims": {"3": 214, "4": 40854}, "note": "", "seconds": 16.52}
+{"family": "rand3", "n": 34, "clauses": 153, "trial": 4, "pc_degree": 4, "dims": {"3": 153, "4": 51667}, "note": "", "seconds": 121.18}
+{"family": "rand3", "n": 34, "clauses": 153, "trial": 5, "pc_degree": 4, "dims": {"3": 307, "4": 38264}, "note": "", "seconds": 13.28}
+{"family": "rand3", "n": 34, "clauses": 153, "trial": 6, "pc_degree": 4, "dims": {"3": 213, "4": 41077}, "note": "", "seconds": 22.77}
+{"family": "rand3", "n": 34, "clauses": 153, "trial": 7, "pc_degree": 4, "dims": {"3": 153, "4": 51625}, "note": "", "seconds": 59.39}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 0, "pc_degree": 4, "dims": {"3": 205, "4": 70830}, "note": "", "seconds": 231.8}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 1, "pc_degree": 4, "dims": {"3": 171, "4": 82876}, "note": "", "seconds": 195.46}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 2, "pc_degree": 4, "dims": {"3": 241, "4": 48899}, "note": "", "seconds": 27.75}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 3, "pc_degree": 4, "dims": {"3": 170, "4": 60582}, "note": "", "seconds": 81.31}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 4, "pc_degree": 4, "dims": {"3": 171, "4": 62958}, "note": "", "seconds": 91.15}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 5, "pc_degree": 4, "dims": {"3": 549, "4": 71539}, "note": "", "seconds": 101.79}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 6, "pc_degree": 4, "dims": {"3": 171, "4": 81956}, "note": "", "seconds": 250.59}
+{"family": "rand3", "n": 38, "clauses": 171, "trial": 7, "pc_degree": 4, "dims": {"3": 241, "4": 69385}, "note": "", "seconds": 99.0}

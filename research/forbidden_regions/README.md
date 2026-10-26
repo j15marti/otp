@@ -97,7 +97,8 @@ solver confirms it is UNSAT.
 | 22 | 110 | 8 | 1/8 | deg 3: 1, deg 4: 7 | 0.114 |
 | 26 | 130 | 8 | 0/8 | deg 4: 8 | 0.075 |
 | 30 | 150 | 8 | 0/8 | deg 4: 8 | 0.051 |
-| 34 | 170 | 6 | 0/6 | deg 4: 6 | 0.040 |
+| 34 | 170 | 8 | 0/8 | deg 4: 8 | 0.040 |
+| 38 | 190 | 8 | 0/8 | deg 4: 8 | 0.028 |
 
 **Random 3-CNF, density 4.5 (UNSAT instances only)**
 
@@ -109,7 +110,8 @@ solver confirms it is UNSAT.
 | 22 | 99 | 8 | 1/8 | deg 3: 1, deg 4: 7 | 0.085 |
 | 26 | 117 | 8 | 0/8 | deg 4: 8 | 0.092 |
 | 30 | 135 | 8 | 0/8 | deg 4: 8 | 0.042 |
-| 34 | 153 | 4 | 0/4 | deg 4: 4 | 0.033 |
+| 34 | 153 | 8 | 0/8 | deg 4: 8 | 0.033 |
+| 38 | 171 | 8 | 0/8 | deg 4: 8 | 0.022 |
 
 **Free package only (degree <= 3), larger n, density 5.0**
 
